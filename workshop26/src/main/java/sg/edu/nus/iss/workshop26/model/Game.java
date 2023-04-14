@@ -93,7 +93,7 @@ public class Game {
                 .add("thumbnail", this.image);
     }
 
-    public static Game convertFromJSON(Document d) {
+    public static Game convertFromDocument(Document d) {
         Game game = new Game();
         game.setGid(d.getInteger("gid"));
         game.setName(d.getString("name"));

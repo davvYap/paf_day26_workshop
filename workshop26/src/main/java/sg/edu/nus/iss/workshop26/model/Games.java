@@ -74,7 +74,7 @@ public class Games {
                 + ", gamesList=" + gamesList + "]";
     }
 
-    public JsonObject toJSON() {
+    public JsonObject toJSONByOffsetLimit() {
         JsonArrayBuilder jsArr = Json.createArrayBuilder();
         List<JsonObjectBuilder> listOfGames = this.getGamesList().stream()
                 .map(g -> g.toJSON())
@@ -83,11 +83,28 @@ public class Games {
             jsArr.add(jsonObjectBuilder);
         }
         return Json.createObjectBuilder()
-                .add("games", jsArr)
                 .add("offset", this.offset)
                 .add("limit", this.limit)
                 .add("total", this.total)
                 .add("timestamp", this.timestamp.toString())
+                .add("games", jsArr)
+                .build();
+    }
+
+    public JsonObject toJSONByPage() {
+        JsonArrayBuilder jsArr = Json.createArrayBuilder();
+        List<JsonObjectBuilder> listOfGames = this.getGamesList().stream()
+                .map(g -> g.toJSON())
+                .toList();
+        for (JsonObjectBuilder jsonObjectBuilder : listOfGames) {
+            jsArr.add(jsonObjectBuilder);
+        }
+        return Json.createObjectBuilder()
+                .add("page", this.offset)
+                .add("size", this.limit)
+                .add("total", this.total)
+                .add("timestamp", this.timestamp.toString())
+                .add("games", jsArr)
                 .build();
     }
 

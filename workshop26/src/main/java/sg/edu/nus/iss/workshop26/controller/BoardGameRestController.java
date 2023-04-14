@@ -138,7 +138,9 @@ public class BoardGameRestController {
                     .status(HttpStatus.NOT_FOUND)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(Json.createObjectBuilder()
-                            .add("Error message", "No game were found with %s %d".formatted(operator, year))
+                            .add("Error message",
+                                    "No game were found with %s %d"
+                                            .formatted(operator, year))
                             .build().toString());
         }
 
@@ -150,10 +152,8 @@ public class BoardGameRestController {
     // get games based on List of gid
     @PostMapping(path = "/games/listOfYear", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<String> getGamesByListOfGid(@RequestBody MultiValueMap<String, String> formData) {
-        List<String> years = new ArrayList<>();
-        years.add(formData.getFirst("year_1"));
-        years.add(formData.getFirst("year_2"));
-        years.add(formData.getFirst("year_3"));
+        String yearsStr = formData.getFirst("years");
+        List<String> years = boardgameService.getListFromString(yearsStr);
 
         List<Game> gameList = boardgameService
                 .getGamesByListofYear(years.stream().map(id -> Integer.valueOf(id)).toList());
@@ -163,12 +163,7 @@ public class BoardGameRestController {
                     .status(HttpStatus.NOT_FOUND)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(Json.createObjectBuilder()
-                            .add("Error message",
-                                    "No game were found with %s, %s & %s"
-                                            .formatted(
-                                                    formData.getFirst("year_1"),
-                                                    formData.getFirst("year_2"),
-                                                    formData.getFirst("year_3")))
+                            .add("Error message", "No game were found with years of %s".formatted(yearsStr))
                             .build().toString());
         }
 

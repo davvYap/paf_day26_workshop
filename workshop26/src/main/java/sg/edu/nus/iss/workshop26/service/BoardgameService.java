@@ -1,5 +1,6 @@
 package sg.edu.nus.iss.workshop26.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,4 +54,14 @@ public class BoardgameService {
     public List<Game> getGamesByListofYear(List<Integer> years) {
         return boardgameRepository.getGamesByListofYear(years);
     }
+
+    public List<String> getListFromString(String input) {
+        String[] inputArray = input.split(",");
+        List<String> list = new ArrayList<>();
+        for (String string : inputArray) {
+            list.add(string.strip());
+        }
+        return list;
+    }
+
 }

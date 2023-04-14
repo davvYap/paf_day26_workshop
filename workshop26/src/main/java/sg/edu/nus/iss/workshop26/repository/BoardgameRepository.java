@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -86,4 +87,29 @@ public class BoardgameRepository {
 
     }
 
+    // get games based on year
+    public List<Game> getGamesByYear(String operator, int year) {
+        Query query = new Query();
+
+        if (operator.equalsIgnoreCase("gte")) {
+            query = Query.query(Criteria.where("year").gte(year));
+        } else if (operator.equalsIgnoreCase("lte")) {
+            query = Query.query(Criteria.where("year").lte(year));
+        } else {
+            query = Query.query(Criteria.where("year").gt(year));
+        }
+        query.with(Sort.by(Sort.Direction.ASC, "year"));
+
+        return mongoTemplate.find(query, Document.class, "games")
+                .stream().map(d -> Game.convertFromDocument(d))
+                .toList();
+    }
+
+    // get games based on List of gid
+    public List<Game> getGamesByListofYear(List<Integer> years) {
+        Query query = Query.query(Criteria.where("year").in(years));
+        return mongoTemplate.find(query, Document.class, "games")
+                .stream().map(d -> Game.convertFromDocument(d))
+                .toList();
+    }
 }

@@ -14,7 +14,9 @@ public class Games {
     private int offset;
     private int total;
     private LocalDateTime timestamp;
-
+    private int year;
+    private String operator;
+    private List<String> yearList = new ArrayList<>();
     private List<Game> gamesList = new ArrayList<>();
 
     public Games() {
@@ -58,6 +60,30 @@ public class Games {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
+
+    public List<String> getYearList() {
+        return yearList;
+    }
+
+    public void setYearList(List<String> yearList) {
+        this.yearList = yearList;
     }
 
     public List<Game> getGamesList() {
@@ -104,6 +130,42 @@ public class Games {
                 .add("size", this.limit)
                 .add("total", this.total)
                 .add("timestamp", this.timestamp.toString())
+                .add("games", jsArr)
+                .build();
+    }
+
+    public JsonObject toJSONByYear() {
+        JsonArrayBuilder jsArr = Json.createArrayBuilder();
+        List<JsonObjectBuilder> listOfGames = this.getGamesList().stream()
+                .map(g -> g.toJSON())
+                .toList();
+        for (JsonObjectBuilder jsonObjectBuilder : listOfGames) {
+            jsArr.add(jsonObjectBuilder);
+        }
+        return Json.createObjectBuilder()
+                .add("operator", this.operator)
+                .add("year", this.year)
+                .add("games", jsArr)
+                .build();
+    }
+
+    public JsonObject toJSONByYearList() {
+        JsonArrayBuilder jsArr = Json.createArrayBuilder();
+        List<JsonObjectBuilder> listOfGames = this.getGamesList().stream()
+                .map(g -> g.toJSON())
+                .toList();
+        for (JsonObjectBuilder jsonObjectBuilder : listOfGames) {
+            jsArr.add(jsonObjectBuilder);
+        }
+
+        JsonArrayBuilder yearJsArr = Json.createArrayBuilder();
+
+        for (String year : this.yearList) {
+            yearJsArr.add(year);
+        }
+
+        return Json.createObjectBuilder()
+                .add("years", yearJsArr)
                 .add("games", jsArr)
                 .build();
     }

@@ -1,14 +1,18 @@
 package sg.edu.nus.iss.workshop26.controller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -118,5 +122,62 @@ public class BoardGameRestController {
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(game.toJSON().build().toString());
+    }
+
+    // get by year
+    @GetMapping(path = "/games/year")
+    public ResponseEntity<String> getGameById(@RequestParam String operator, @RequestParam int year) {
+        List<Game> gameList = boardgameService.getGamesByYear(operator, year);
+        Games games = new Games();
+        games.setYear(year);
+        games.setOperator(operator);
+        games.setGamesList(gameList);
+
+        if (gameList.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Json.createObjectBuilder()
+                            .add("Error message", "No game were found with %s %d".formatted(operator, year))
+                            .build().toString());
+        }
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(games.toJSONByYear().toString());
+    }
+
+    // get games based on List of gid
+    @PostMapping(path = "/games/listOfYear", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<String> getGamesByListOfGid(@RequestBody MultiValueMap<String, String> formData) {
+        List<String> years = new ArrayList<>();
+        years.add(formData.getFirst("year_1"));
+        years.add(formData.getFirst("year_2"));
+        years.add(formData.getFirst("year_3"));
+
+        List<Game> gameList = boardgameService
+                .getGamesByListofYear(years.stream().map(id -> Integer.valueOf(id)).toList());
+
+        if (gameList.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Json.createObjectBuilder()
+                            .add("Error message",
+                                    "No game were found with %s, %s & %s"
+                                            .formatted(
+                                                    formData.getFirst("year_1"),
+                                                    formData.getFirst("year_2"),
+                                                    formData.getFirst("year_3")))
+                            .build().toString());
+        }
+
+        Games games = new Games();
+        games.setYearList(years);
+        games.setGamesList(gameList);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(games.toJSONByYearList().toString());
     }
 }

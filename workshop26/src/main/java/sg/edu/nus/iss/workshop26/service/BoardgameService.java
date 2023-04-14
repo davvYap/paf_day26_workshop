@@ -45,4 +45,12 @@ public class BoardgameService {
         }
         return Game.convertFromDocument(boardgameRepository.getGameById(id).get());
     }
+
+    public List<Game> getGamesByYear(String operator, int year) {
+        return boardgameRepository.getGamesByYear(operator, year);
+    }
+
+    public List<Game> getGamesByListofYear(List<Integer> years) {
+        return boardgameRepository.getGamesByListofYear(years);
+    }
 }
